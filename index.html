@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>This is BC | Find your place</title>
+<meta name="description" content="Explore, compare and shortlist British Columbia communities, then get set up when you arrive.">
+<meta name="theme-color" content="#2a1c12">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="This is BC">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<style>
+:root {
+  --bg1:#1a120b; --bg2:#2a1c12; --bg3:#3a2418; --card:#2c1e14; --card2:#24180f; --line:#5c4033;
+  --text:#f5e6d3; --muted:#c4a882; --mint:#e8a54b; --red:#c45c26; --redh:#d46a30;
+  --hero:linear-gradient(125deg,#3d2415,#8b4513,#c45c26); --heroAccent:#ffb347; --heroKicker:#ffb347; --heroText:#f5e6d3;
+  --ok:#81c784; --warn:#ffb74d; --err:#e57373; --info:#90a4ae;
+  --font: "Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+* { box-sizing:border-box; }
+html, body { height:100%; margin:0; }
+body { font-family:var(--font); background:color-mix(in srgb, var(--bg1) 55%, #000); color:var(--text); -webkit-text-size-adjust:100%; }
+.stage { min-height:100%; display:flex; align-items:center; justify-content:center; padding:16px; }
+.phone { position:relative; width:392px; height:min(844px, calc(100vh - 32px)); min-height:560px; display:flex; flex-direction:column; overflow:hidden;
+  background:var(--bg1); color-scheme:dark; border-radius:38px; border:9px solid #0b0b0d; box-shadow:0 0 0 2px #2b2b30, 0 30px 80px rgba(0,0,0,.55); }
+@media (max-width:480px) {
+  .stage { padding:0; align-items:stretch; }
+  .phone { width:100%; height:100dvh; min-height:0; border:0; border-radius:0; box-shadow:none; }
+}
+.appbar { flex:none; display:flex; align-items:center; justify-content:center; padding:calc(12px + env(safe-area-inset-top)) 16px 12px; background:var(--bg2); border-bottom:1px solid var(--line); }
+.brand { font-weight:800; font-size:17px; letter-spacing:-.01em; }
+.screen { flex:1; overflow-y:auto; padding:16px 16px 28px; display:flex; flex-direction:column; gap:12px; scroll-behavior:auto; outline:none; }
+.screen > * { flex-shrink:0; }
+#home-sugg:empty { display:none; }
+.tabs { flex:none; display:grid; grid-template-columns:repeat(5,1fr); background:var(--bg2); border-top:1px solid var(--line); padding:6px 4px calc(6px + env(safe-area-inset-bottom)); }
+.tab { background:none; border:0; color:var(--muted); font:inherit; font-size:11.5px; display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; border-radius:12px; cursor:pointer; }
+.tab svg { width:23px; height:23px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+.tab[aria-current="page"] { color:var(--mint); font-weight:700; background:color-mix(in srgb, var(--mint) 14%, transparent); }
+button, select, input, textarea { font:inherit; color:inherit; }
+button, a, select { touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+:focus-visible { outline:2px solid var(--mint); outline-offset:2px; }
+h1,h2,h3,p { margin:0; }
+h1 { font-size:27px; line-height:1.12; letter-spacing:-.025em; font-weight:800; color:var(--mint); }
+h2 { font-size:19px; font-weight:800; letter-spacing:-.01em; }
+h3 { font-size:17px; font-weight:750; letter-spacing:-.005em; }
+.sub { color:var(--muted); font-size:13.5px; line-height:1.45; }
+.sm { font-size:12.5px; } .xs { font-size:11.5px; }
+.muted { color:var(--muted); }
+.card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:8px; }
+.hero { border-radius:20px; padding:20px; background:var(--hero); color:var(--heroText); display:flex; flex-direction:column; gap:8px; }
+.hero .leaf { font-size:42px; line-height:1; }
+.hero .kicker { color:var(--heroKicker); font-weight:700; font-size:12.5px; }
+.hero h1 { color:var(--heroText); font-size:29px; }
+.hero p { font-size:13.5px; line-height:1.5; }
+.row { display:flex; flex-wrap:wrap; gap:8px; }
+.btn { display:inline-flex; align-items:center; justify-content:center; text-align:center; gap:6px; background:var(--card2); border:1px solid var(--line); color:var(--text); border-radius:12px;
+  padding:10px 14px; font-weight:650; font-size:14px; text-decoration:none; cursor:pointer; line-height:1.2; }
+.btn:hover { border-color:var(--mint); }
+.btn.primary { background:var(--red); border-color:var(--red); color:#fff; }
+.btn.primary:hover { background:var(--redh); }
+.btn.link { color:var(--mint); background:transparent; }
+.btn.plain { background:none; border:0; color:var(--mint); padding:6px 2px; }
+.btn.full { width:100%; }
+.btn:disabled { opacity:.45; cursor:not-allowed; }
+.field { display:flex; flex-direction:column; gap:5px; }
+.field > span { font-size:13px; color:var(--muted); }
+select, input[type=text], input[type=search], input[type=number], textarea { width:100%; background:var(--card2); border:1px solid var(--line); border-radius:12px; padding:11px 12px; font-size:15px; }
+textarea { resize:vertical; min-height:84px; }
+input[type=range] { width:100%; accent-color:var(--red); }
+.switch { display:flex; align-items:center; gap:10px; font-size:14px; cursor:pointer; }
+.switch input { width:20px; height:20px; accent-color:var(--red); }
+.chips { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin:0 -16px; padding-left:16px; padding-right:16px; scrollbar-width:thin; }
+.chip { flex:none; background:var(--card2); border:1px solid var(--line); color:var(--text); border-radius:999px; padding:8px 13px; font-size:13.5px; cursor:pointer; white-space:nowrap; }
+.chip[aria-pressed="true"] { background:var(--red); border-color:var(--red); color:#fff; font-weight:700; }
+.metrics { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.metrics.three { grid-template-columns:repeat(3,1fr); gap:8px; }
+.metric { background:var(--card2); border:1px solid var(--line); border-radius:14px; padding:12px; min-width:0; }
+.metric small { display:block; color:var(--muted); font-size:12px; margin-bottom:3px; }
+.metric b { font-size:18px; letter-spacing:-.01em; overflow-wrap:anywhere; }
+.metrics.three .metric b { font-size:16px; }
+.note { border:1px solid var(--info); background:var(--card2); border-radius:12px; padding:11px 12px; font-size:13.5px; line-height:1.45; }
+.note.error { border-color:var(--err); } .note.warning { border-color:var(--warn); } .note.success { border-color:var(--ok); }
+.facts-list { display:flex; flex-direction:column; gap:7px; font-size:14px; line-height:1.4; }
+.badge { color:var(--mint); font-size:13px; font-weight:650; }
+.place { gap:4px; }
+.lock { align-items:center; text-align:center; gap:10px; padding:18px 14px; }
+.lock .big { font-size:34px; }
+.lock ul { text-align:left; margin:0; padding-left:18px; font-size:13.5px; line-height:1.55; }
+.about p { font-size:13.5px; line-height:1.5; margin:0 0 8px; }
+.toast { position:absolute; left:16px; right:16px; bottom:84px; background:#0b0b0d; color:#fff; border:1px solid var(--line); border-radius:12px; padding:11px 14px; font-size:13.5px;
+  opacity:0; transform:translateY(8px); pointer-events:none; transition:opacity .2s, transform .2s; z-index:5; }
+.toast.show { opacity:1; transform:none; }
+.modal { position:absolute; inset:0; background:rgba(0,0,0,.62); display:flex; align-items:center; justify-content:center; padding:18px; z-index:6; }
+.modal[hidden] { display:none; }
+.dialog { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:16px; width:100%; max-height:84%; display:flex; flex-direction:column; gap:10px; }
+.dialog pre { margin:0; overflow:auto; white-space:pre-wrap; font:12.5px/1.5 var(--font); background:var(--card2); border-radius:10px; padding:10px; user-select:text; }
+.footer { color:var(--muted); font-size:11.5px; line-height:1.45; }
+@media (prefers-reduced-motion: reduce) { .toast { transition:none; } }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="phone" id="phone">
+    <header class="appbar"><span class="brand">🍁 This is BC</span></header>
+    <main class="screen" id="screen" tabindex="-1"></main>
+    <nav class="tabs" id="tabs" aria-label="Main">
+      <button class="tab" data-act="tab" data-a="0"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/></svg>Home</button>
+      <button class="tab" data-act="tab" data-a="1"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>Explore</button>
+      <button class="tab" data-act="tab" data-a="2"><svg viewBox="0 0 24 24"><path d="M4 8h14m-3-3 3 3-3 3"/><path d="M20 16H6m3-3-3 3 3 3"/></svg>Compare</button>
+      <button class="tab" data-act="tab" data-a="3"><svg viewBox="0 0 24 24"><path d="M6.5 4h11v16l-5.5-4-5.5 4z"/></svg>Shortlist</button>
+      <button class="tab" data-act="tab" data-a="4"><svg viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18.5" cy="12" r="1.3"/></svg>More</button>
+    </nav>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="modal" id="modal" hidden><div class="dialog" id="dialog" role="dialog" aria-modal="true"></div></div>
+  </div>
+</div>
+
+<script id="bc-data" type="application/json">{"cities":[{"name":"Vancouver","region":"Lower Mainland","type":"CMA","pop2021":2642825,"pop2016":2463431,"rent1br":"$1,807/month average","crime":"CSI 83.5 (slightly above national avg)","lat":49.2827,"lng":-123.1207,"vegan":"excellent","cost":"Very High","people":"Highly diverse, large immigrant communities","foods":"Sushi, dim sum, ramen, West Coast seafood"},{"name":"Victoria","region":"Vancouver Island","type":"CMA","pop2021":397237,"pop2016":367770,"rent1br":"$1,624/month average","crime":"CSI 74.6 (near national avg)","lat":48.4284,"lng":-123.3656,"vegan":"excellent","cost":"High","people":"Older median age, retirees, students","foods":"Pacific salmon, Dungeness crab, fish & chips"},{"name":"Kelowna","vegan":"good","veganNote":"A handful of vegan and vegetarian cafés downtown, and most restaurants have plant-based options","type":"CMA","pop2021":222162,"pop2016":194892,"region":"Okanagan","people":"Mix of retirees, families, tourism & wine industry workers, growing young population","foods":"Okanagan fruit & wine, farm-to-table, stone fruit, local cheeses, outdoor patio dining","cost":"High","rent1br":"$1,597/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"CSI 103.7 (above avg)","lat":49.888,"lng":-119.496},{"name":"Abbotsford–Mission","vegan":"good","veganNote":"Few dedicated vegan spots, but South Asian restaurants offer many naturally vegan dishes (dal, chana, sabzi)","type":"CMA","pop2021":195726,"pop2016":180518,"region":"Fraser Valley","people":"Family-oriented, agricultural community, significant South Asian population","foods":"Farm-fresh produce, South Asian cuisine, berry farms, local dairy","cost":"Medium","rent1br":"$1,278/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"CSI 95.5 (above avg)","lat":49.0504,"lng":-122.3045},{"name":"Nanaimo","vegan":"good","veganNote":"A few veg-focused cafés and vegan-friendly menus downtown; vegan Nanaimo bars are easy to find","type":"CMA","pop2021":115459,"pop2016":104936,"region":"Vancouver Island","people":"Mix of retirees, students (VIU), coastal & tourism workers","foods":"Seafood, Nanaimo bars, local markets, waterfront dining","cost":"High","rent1br":"$1,527/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"CSI 106.0 (above avg)","lat":49.1659,"lng":-123.9401},{"name":"Kamloops","vegan":"some","veganNote":"Some vegan-friendly cafés and options at chain and ethnic restaurants","type":"CMA","pop2021":114142,"pop2016":103811,"region":"Thompson","people":"Younger working population, resource & education sector, outdoor lifestyle","foods":"Ranch & BBQ, local beef, farm-to-table, Thompson River valley produce","cost":"Medium","rent1br":"$1,345/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"CSI 126.2 (high)","lat":50.6745,"lng":-120.3273},{"name":"Chilliwack","vegan":"some","veganNote":"Mostly options on regular menus rather than dedicated vegan spots","type":"CMA","pop2021":113767,"pop2016":101512,"region":"Fraser Valley","people":"Families, agricultural workers, growing commuter community","foods":"Farm produce, berries, local dairy, valley agriculture","cost":"Medium","rent1br":"$1,222/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"CSI 134.3 (highest among BC CMAs)","lat":49.1579,"lng":-121.9514},{"name":"Prince George","vegan":"some","veganNote":"A few spots with clear vegan options; choice narrows outside the downtown core","type":"CA","pop2021":89490,"pop2016":86622,"region":"Northern BC","people":"Resource industry workers, younger families, university community","foods":"Hearty comfort food, local game, Northern BC produce","cost":"Medium","rent1br":"$1,214/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"No CMA-level CSI published (varies by local police data)","lat":53.9171,"lng":-122.7497},{"name":"Vernon","vegan":"some","veganNote":"Vegan options at cafés and farm-to-table spots; few dedicated vegan restaurants","type":"CA","pop2021":67086,"pop2016":61324,"region":"Okanagan","people":"Retirees, tourism workers, outdoor enthusiasts","foods":"Okanagan fruit, wine, farm-to-table","cost":"Medium","rent1br":"$1,234/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"No CMA-level CSI published (varies by local police data)","lat":50.267,"lng":-119.272},{"name":"Courtenay","vegan":"good","veganNote":"Comox Valley has a strong organic and local-food culture with several vegan-friendly cafés","type":"CA","pop2021":63282,"pop2016":57950,"region":"Vancouver Island","people":"Retirees, coastal families, tourism & service workers","foods":"Seafood, local markets, Island produce","cost":"Medium","rent1br":"$1,459/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"No CMA-level CSI published (varies by local police data)","lat":49.6879,"lng":-124.9944},{"name":"Duncan","vegan":"some","veganNote":"Cowichan Valley farm culture means good produce and some plant-based menu options","type":"CA","pop2021":47582,"pop2016":44451,"region":"Vancouver Island","people":"Small-town, mix of retirees and local workers","foods":"Farm-to-table, local produce, seafood","cost":"Medium","rent1br":"$1,283/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"No CMA-level CSI published (varies by local police data)","lat":48.7787,"lng":-123.7079},{"name":"Penticton","vegan":"some","veganNote":"Wine-country restaurants usually have a vegan dish or two; few dedicated spots","type":"CA","pop2021":47380,"pop2016":43534,"region":"Okanagan","people":"Tourism & wine industry, retirees, seasonal workers","foods":"Wine country cuisine, fruit, outdoor dining","cost":"Lower","rent1br":"$1,197/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"No CMA-level CSI published (varies by local police data)","lat":49.4991,"lng":-119.5937},{"name":"Campbell River","vegan":"limited","veganNote":"Seafood-focused dining; expect to rely on a few menu items and grocery stores","type":"CA","pop2021":40704,"pop2016":37861,"region":"Vancouver Island","people":"Fishing & resource community, outdoor lifestyle","foods":"Fresh seafood, salmon, coastal cuisine","cost":"Medium","rent1br":"$1,282/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"No CMA-level CSI published (varies by local police data)","lat":50.0167,"lng":-125.2444},{"name":"Parksville","vegan":"limited","veganNote":"Small, casual dining scene with limited dedicated vegan choice","type":"CA","pop2021":31054,"pop2016":28922,"region":"Vancouver Island","people":"Retirement community, beach town residents","foods":"Seafood, casual coastal dining","cost":"High","rent1br":"$1,546/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"No CMA-level CSI published (varies by local police data)","lat":49.3193,"lng":-124.3136},{"name":"Fort St. John","vegan":"limited","veganNote":"Meat-heavy Northern dining; vegan choice is mostly limited to chain restaurants and groceries","type":"CA","pop2021":28729,"pop2016":28396,"region":"Northeast","people":"Oil & gas workers, younger resource community","foods":"Hearty Northern fare, local beef","cost":"Lower","rent1br":"$917/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"No CMA-level CSI published (varies by local police data)","lat":56.2465,"lng":-120.8476},{"name":"Cranbrook","vegan":"limited","veganNote":"A few options at cafés and chains; little dedicated vegan dining","type":"CA","pop2021":27040,"pop2016":26068,"region":"Kootenay","people":"Outdoor enthusiasts, resource & tourism workers","foods":"Mountain cuisine, local game, craft beer","cost":"Lower","rent1br":"$1,052/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"No CMA-level CSI published (varies by local police data)","lat":49.5097,"lng":-115.7688},{"name":"Squamish","vegan":"good","veganNote":"Young, outdoorsy crowd keeps plant-based options common at cafés and breweries","type":"CA","pop2021":24232,"pop2016":19893,"region":"Sea to Sky","people":"Young outdoor adventurers, growing commuter & tourism community","foods":"West Coast seafood, brewery food, outdoor-friendly dining","cost":"High","rent1br":"$1,626/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"No CMA-level CSI published (varies by local police data)","lat":49.7016,"lng":-123.1558},{"name":"Nelson","vegan":"good","veganNote":"Well known for its natural-food culture, with vegan-friendly cafés and a natural foods co-op","type":"CA","pop2021":19119,"pop2016":18307,"region":"Kootenay","people":"Arts & outdoor community, mix of retirees and young creatives","foods":"Local produce, craft food, mountain cuisine","cost":"Lower","rent1br":"$1,159/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"No CMA-level CSI published (varies by local police data)","lat":49.4928,"lng":-117.2948},{"name":"Williams Lake","vegan":"limited","veganNote":"Ranching town; vegan choice is mostly limited to a few menu items and groceries","type":"CA","pop2021":23608,"pop2016":23113,"region":"Cariboo","people":"Resource industry, ranching community, outdoor lifestyle","foods":"Ranch beef, local game, hearty Northern fare","cost":"Lower","rent1br":"$1,082/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"No CMA-level CSI published (varies by local police data)","lat":52.1417,"lng":-122.1445},{"name":"Salmon Arm","vegan":"some","veganNote":"Some vegan-friendly cafés and good local produce","type":"CA","pop2021":19705,"pop2016":17904,"region":"Shuswap","people":"Retirement and tourism community, lake lifestyle","foods":"Local produce, fruit, farm-to-table","cost":"Lower","rent1br":"$1,151/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"No CMA-level CSI published (varies by local police data)","lat":50.7001,"lng":-119.2838},{"name":"Powell River","vegan":"some","veganNote":"Small but health-conscious food scene with some plant-based options","type":"CA","pop2021":17825,"pop2016":16783,"region":"Sunshine Coast","people":"Coastal community, mix of retirees and outdoor enthusiasts","foods":"Seafood, local markets, coastal cuisine","cost":"Lower","rent1br":"$957/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"No CMA-level CSI published (varies by local police data)","lat":49.8353,"lng":-124.5247},{"name":"Port Alberni","vegan":"limited","veganNote":"Few dedicated vegan options; mostly menu substitutions","type":"CA","pop2021":25786,"pop2016":24669,"region":"Vancouver Island","people":"Resource and forestry community, outdoor lifestyle","foods":"Seafood, local produce, Island cuisine","cost":"Lower","rent1br":"$994/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"No CMA-level CSI published (varies by local police data)","lat":49.2339,"lng":-124.8055},{"name":"Quesnel","vegan":"limited","veganNote":"Few dedicated vegan options; mostly menu substitutions and groceries","type":"CA","pop2021":23113,"pop2016":23146,"region":"Cariboo","people":"Resource industry workers, ranching community","foods":"Local beef, hearty fare, Northern produce","cost":"Lower","rent1br":"$889/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"No CMA-level CSI published (varies by local police data)","lat":52.9784,"lng":-122.4927},{"name":"Terrace","vegan":"limited","veganNote":"Small dining scene with limited plant-based choice","type":"CA","pop2021":19606,"pop2016":19160,"region":"Northwest","people":"Resource and forestry workers, outdoor community","foods":"Local game, seafood access, Northern cuisine","cost":"Lower","rent1br":"1-bedroom average not published (sample too small); 2-bedroom average $1,205/month","rentSource":"CMHC Rental Market Survey, Oct 2025 (2-bedroom estimate rated poor reliability)","crime":"No CMA-level CSI published (varies by local police data)","lat":54.5163,"lng":-128.6035},{"name":"Prince Rupert","vegan":"limited","veganNote":"Seafood-focused; limited plant-based choice","type":"CA","pop2021":13442,"pop2016":13462,"region":"Northwest","people":"Port and fishing community, coastal workers","foods":"Fresh seafood, salmon, coastal fare","cost":"Lower","rent1br":"$1,143/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"No CMA-level CSI published (varies by local police data)","lat":54.315,"lng":-130.3208},{"name":"Dawson Creek","vegan":"limited","veganNote":"Meat-heavy Northern dining; limited vegan choice","type":"CA","pop2021":17878,"pop2016":18890,"region":"Northeast","people":"Oil & gas and resource community","foods":"Hearty Northern food, local beef","cost":"Lower","rent1br":"$959/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"No CMA-level CSI published (varies by local police data)","lat":55.7596,"lng":-120.2377},{"name":"Trail","vegan":"limited","veganNote":"Italian-heritage spots can do pasta and veggie dishes; little dedicated vegan dining","type":"CA","pop2021":14268,"pop2016":14196,"region":"Kootenay","people":"Industrial and outdoor community, mining heritage","foods":"Local produce, mountain cuisine, Italian heritage influence","cost":"Lower","rent1br":"$904/month average","rentSource":"CMHC Rental Market Survey, Oct 2025","crime":"No CMA-level CSI published (varies by local police data)","lat":49.0966,"lng":-117.7092}],"jobs":{"Vancouver":"Tech, film & TV, tourism, finance, port & trade","Victoria":"Government, tourism, education, healthcare, tech","Kelowna":"Tourism, wine & agriculture, healthcare, construction, tech","Abbotsford–Mission":"Agriculture, manufacturing, healthcare, retail","Nanaimo":"Healthcare, education, tourism, retail, port services","Kamloops":"Healthcare, education, resource industries, retail","Chilliwack":"Agriculture, healthcare, manufacturing, retail","Prince George":"Forestry, healthcare, education, retail","Vernon":"Tourism, agriculture, healthcare, retail","Courtenay":"Healthcare, tourism, retail, education","Duncan":"Agriculture, tourism, healthcare, retail","Penticton":"Tourism, wine & agriculture, healthcare, retail","Campbell River":"Forestry, fishing, tourism, healthcare","Parksville":"Tourism, healthcare, retail","Fort St. John":"Oil & gas, construction, healthcare","Cranbrook":"Healthcare, retail, tourism, resource industries","Squamish":"Tourism, outdoor recreation, construction, retail","Nelson":"Tourism, arts, healthcare, retail","Williams Lake":"Forestry, ranching, healthcare, retail","Salmon Arm":"Agriculture, tourism, healthcare, retail","Powell River":"Tourism, forestry, healthcare, retail","Port Alberni":"Forestry, tourism, healthcare, retail","Quesnel":"Forestry, agriculture, healthcare, retail","Terrace":"Forestry, healthcare, retail, transportation","Prince Rupert":"Port & shipping, tourism, healthcare, fishing","Dawson Creek":"Oil & gas, agriculture, healthcare, retail","Trail":"Mining & smelting, healthcare, retail"},"extra":{"Vancouver":{"climate":"Mild, rainy winters and warm, generally dry summers.","climate_tier":1,"good_for":["Young professionals","Diverse food","Transit","Outdoor access"],"housing":"2-bedroom average listed in the project data: about $2,400/month.","transit":"SkyTrain, buses and SeaBus.","forecast":"https://www.theweathernetwork.com/ca/weather/british-columbia/vancouver","vanscene":"https://vanscene.vercel.app/#view=map&years=none"},"Victoria":{"climate":"Mild winters and relatively dry, sunny summers.","climate_tier":1,"good_for":["Students","Walkability","Mild climate","Retirees"],"housing":"2-bedroom average listed in the project data: about $2,100/month.","transit":"Regional bus network.","forecast":"https://www.theweathernetwork.com/ca/weather/british-columbia/victoria"},"Kelowna":{"climate":"Hot, dry summers and colder winters.","climate_tier":2,"good_for":["Families","Outdoor lifestyle","Retirees"],"housing":"2-bedroom average listed in the project data: about $1,900/month.","transit":"Local bus network; many areas are car-oriented.","forecast":"https://www.theweathernetwork.com/ca/weather/british-columbia/kelowna"}},"places":{"Vancouver":[{"name":"Stanley Park","desc":"Seawall, beaches and forest trails"},{"name":"Granville Island","desc":"Public market, food and artisans"},{"name":"Capilano Suspension Bridge Park","desc":"Treetop walkways and rainforest"},{"name":"Gastown","desc":"Historic district with the steam clock"},{"name":"Queen Elizabeth Park","desc":"Gardens and city views"}],"Victoria":[{"name":"Butchart Gardens","desc":"Famous display gardens"},{"name":"Inner Harbour","desc":"Waterfront, museums and ferries"},{"name":"Beacon Hill Park","desc":"Gardens, ponds and ocean views"},{"name":"Royal BC Museum","desc":"Natural and human history of BC"},{"name":"Fisherman's Wharf","desc":"Floating homes and fresh seafood"}],"Kelowna":[{"name":"Knox Mountain Park","desc":"Hiking trails and lake views"},{"name":"Kelowna Waterfront Park","desc":"Lakefront walks and beaches"},{"name":"Myra Canyon Trestles","desc":"Historic rail-trail bridges"},{"name":"Mission Hill Family Estate","desc":"Winery with lake views"}],"Kamloops":[{"name":"Riverside Park","desc":"Beach and picnic area on the river"},{"name":"Kenna Cartwright Park","desc":"Trails and city viewpoints"},{"name":"BC Wildlife Park","desc":"Local wildlife close up"}],"Nanaimo":[{"name":"Neck Point Park","desc":"Ocean trails and seals"},{"name":"Petroglyph Provincial Park","desc":"Ancient rock carvings"},{"name":"Maffeo Sutton Park","desc":"Harbour-front park"},{"name":"Newcastle Island Marine Provincial Park","desc":"Short ferry ride to forest trails"}],"Prince George":[{"name":"Fort George Park","desc":"River park and rail museum"},{"name":"Cottonwood Island Nature Park","desc":"Riverside forest trails"},{"name":"Exploration Place Museum & Science Centre","desc":"Science and local history"}],"Squamish":[{"name":"Sea to Sky Gondola","desc":"Mountain views and trails"},{"name":"Shannon Falls Provincial Park","desc":"One of BC's tallest waterfalls"},{"name":"Stawamus Chief Provincial Park","desc":"Granite peak hike"}],"Vernon":[{"name":"Kalamalka Lake Provincial Park","desc":"Turquoise lake and trails"},{"name":"Polson Park","desc":"Gardens and duck ponds"},{"name":"Davison Orchards","desc":"Farm market and orchard"}],"Penticton":[{"name":"Skaha Lake Park","desc":"Beach, boating and picnic areas"},{"name":"Munson Mountain","desc":"Quick hike with a view over town"}]},"placesData":{},"services":[{"title":"Social Insurance Number (SIN)","desc":"A SIN is generally needed to work in Canada and access certain government programs.","url":"https://www.canada.ca/en/employment-social-development/services/sin.html","term":"Service Canada Centre"},{"title":"BC Medical Services Plan (MSP)","desc":"Learn about applying for BC's public health insurance plan and eligibility.","url":"https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/msp","term":"Service BC Centre"},{"title":"BC Services Card","desc":"Information about the BC Services Card and how it is used to access services.","url":"https://www2.gov.bc.ca/gov/content/governments/government-id/bc-services-card","term":"Service BC Centre"},{"title":"Driver licensing","desc":"Find information about driver licensing and exchanging an out-of-province licence.","url":"https://www.icbc.com/driver-licensing","term":"ICBC driver licensing office"},{"title":"Settlement services","desc":"Find newcomer and settlement support through the Government of Canada.","url":"https://www.canada.ca/en/immigration-refugees-citizenship/services/new-immigrants.html","term":"immigrant settlement services"}],"sinOffices":[{"name":"Abbotsford","address":"100-32525 Simon Avenue, Abbotsford, BC V2T 6T6","lat":49.053507,"lng":-122.3233413,"id":5944,"note":""},{"name":"Burnaby","address":"100-3480 Gilmore Way, Burnaby, BC V5G 4W7","lat":49.2535324,"lng":-123.0099269,"id":5907,"note":""},{"name":"Campbell River","address":"101-950 Alder Street, Campbell River, BC V9W 2P8","lat":50.024617,"lng":-125.24379,"id":5920,"note":""},{"name":"Chilliwack","address":"100-9345 Main Street, Chilliwack, BC V2P 4M3","lat":49.1717173,"lng":-121.9553719,"id":5942,"note":""},{"name":"Comox Valley","address":"130 19th Street, Courtenay, BC V9N 8S1","lat":49.68284,"lng":-124.986038,"id":5921,"note":""},{"name":"Coquitlam","address":"100-2963 Glen Drive, Coquitlam, BC V3B 2P7","lat":49.2830537,"lng":-122.7971675,"id":5947,"note":""},{"name":"Cowichan","address":"104-2951 Green Road, Duncan, BC V9L 0B9","lat":48.7996418,"lng":-123.7207645,"id":5918,"note":""},{"name":"Cranbrook","address":"250-1113 Baker Street, Cranbrook, BC V1C 1A7","lat":49.5120006,"lng":-115.7653817,"id":5977,"note":""},{"name":"Dawson Creek","address":"103-1508 102nd Avenue, Dawson Creek, BC V1G 2E2","lat":55.759856,"lng":-120.245085,"id":5996,"note":"Open Mon, Wed and Fri only"},{"name":"Kamloops","address":"520 Seymour Street, Kamloops, BC V2C 2G9","lat":50.6752342,"lng":-120.328899,"id":5986,"note":""},{"name":"Kelowna","address":"106-471 Queensway Avenue, Kelowna, BC V1Y 6S5","lat":49.8868854,"lng":-119.4951983,"id":5987,"note":""},{"name":"Langley","address":"102-8747 204th Street, Langley, BC V1M 2Y5","lat":49.1617164,"lng":-122.657271,"id":5952,"note":""},{"name":"Nanaimo","address":"201-60 Front Street, Nanaimo, BC V9R 7B5","lat":49.1684403,"lng":-123.936404,"id":5988,"note":""},{"name":"Nelson","address":"Chahko Mika Mall, 1125 Lakeside Drive, Nelson, BC V1L 6G3","lat":49.4991081,"lng":-117.2884311,"id":5972,"note":""},{"name":"New Westminster","address":"201-620 Royal Avenue, New Westminster, BC V3M 1J2","lat":49.205055,"lng":-122.911633,"id":5940,"note":""},{"name":"North Shore","address":"100-221 Esplanade West, North Vancouver, BC V7M 1A6","lat":49.3122531,"lng":-123.0837531,"id":5911,"note":""},{"name":"Penticton","address":"101-386 Ellis Street, Penticton, BC V2A 8C9","lat":49.4976758,"lng":-119.5901995,"id":5978,"note":""},{"name":"Port Alberni","address":"A-4805 Mar Street, Port Alberni, BC V9Y 8J5","lat":49.232619,"lng":-124.805145,"id":5919,"note":"Open Tue to Fri"},{"name":"Powell River","address":"Suite A-7061 Duncan Street, Powell River, BC V8A 1W1","lat":49.8362229,"lng":-124.518393,"id":5913,"note":"Open Tue to Fri"},{"name":"Prince George","address":"1363 4th Avenue, Prince George, BC V2L 3J6","lat":53.9163432,"lng":-122.7475395,"id":5994,"note":""},{"name":"Prince Rupert","address":"Ocean Centre, Suite 100, 215 3rd Street, Prince Rupert, BC V8J 3T6","lat":54.3134557,"lng":-130.3282414,"id":5991,"note":"Open Tue to Fri"},{"name":"Quesnel","address":"West Park Mall, 104-155 Malcolm Drive, Quesnel, BC V2J 3K2","lat":52.973799,"lng":-122.507079,"id":5424,"note":"Open Tue to Thu"},{"name":"Richmond","address":"350-5611 Cooney Road, Richmond, BC V6X 3K5","lat":49.1723443,"lng":-123.1318886,"id":5912,"note":""},{"name":"Ridge Meadows","address":"11900 Haney Place, Maple Ridge, BC V2X 8R9","lat":49.2179763,"lng":-122.5978119,"id":5150,"note":""},{"name":"Salmon Arm","address":"1st Floor, 191 Shuswap Street Northwest, Salmon Arm, BC V1E 4S2","lat":50.733019,"lng":-119.264603,"id":5351,"note":""},{"name":"Smithers","address":"1020 Murray Street, Smithers, BC V0J 2N0","lat":54.7773,"lng":-127.174,"id":5426,"note":""},{"name":"Squamish","address":"1440 Winnipeg Street, Squamish, BC V8B 0B2","lat":49.699995,"lng":-123.152578,"id":5825,"note":""},{"name":"Surrey North","address":"13889 104th Avenue, Surrey, BC V3T 1W8","lat":49.1916556,"lng":-122.8372124,"id":5851,"note":""},{"name":"Surrey South","address":"103-15295 Highway 10, Surrey, BC V3S 3K2","lat":49.1052548,"lng":-122.7991027,"id":5852,"note":""},{"name":"Terrace","address":"4630 Lazelle Avenue, Terrace, BC V8G 1S6","lat":54.5177342,"lng":-128.5896283,"id":5962,"note":""},{"name":"Trail","address":"101-1101 Dewdney Avenue, Trail, BC V1R 4T1","lat":49.0965771,"lng":-117.707463,"id":5973,"note":"Open Tue to Thu"},{"name":"Vancouver (West Broadway)","address":"1263 West Broadway, Vancouver, BC V6H 1G7","lat":49.2637124,"lng":-123.1331926,"id":5823,"note":""},{"name":"Vancouver Downtown (Sinclair Centre)","address":"Sinclair Centre, Office 125, 757 Hastings Street West, Vancouver, BC V6C 1A1","lat":49.2858928,"lng":-123.1142082,"id":5908,"note":""},{"name":"Vancouver East (Kingsway)","address":"1420 Kingsway, Vancouver, BC V5N 5Y6","lat":49.2495866,"lng":-123.0753594,"id":5922,"note":""},{"name":"Vanderhoof","address":"189 Stewart Street East, Vanderhoof, BC V0J 3A0","lat":54.0161766,"lng":-124.0068566,"id":5439,"note":""},{"name":"Vernon","address":"101-3301 30th Avenue, Vernon, BC V1T 2C9","lat":50.26378,"lng":-119.27697,"id":5979,"note":""},{"name":"Victoria (Douglas Street)","address":"Bay Centre, 450-1150 Douglas Street, Victoria, BC V8W 2C8","lat":48.43646,"lng":-123.36588,"id":5863,"note":""},{"name":"Victoria (West Shore)","address":"3179 Jacklin Road, Victoria, BC V9B 3Y7","lat":48.434396,"lng":-123.514266,"id":5927,"note":""},{"name":"Williams Lake","address":"79 4th Avenue South, Williams Lake, BC V2G 1J6","lat":52.1270765,"lng":-122.141198,"id":5992,"note":"Open Tue to Fri"}],"sinTitle":"Social Insurance Number (SIN)","themes":{"spring":{"bg-1":"#0d1f14","bg-2":"#14301f","bg-3":"#1a3d28","card":"#1a2e22","card-2":"#14261c","line":"#3d6b4a","text":"#e8f5e9","muted":"#a5d6a7","mint":"#66bb6a","red":"#43a047","red-hover":"#4caf50","hero":"linear-gradient(125deg, #1b5e20 0%, #388e3c 45%, #66bb6a 100%)","hero-accent":"#a5d6a7","hero-kicker":"#c8e6c9","hero-text":"#e8f5e9","leaf":"🌸","leaf-color":"#f48fb1"},"summer":{"bg-1":"#0a1a2a","bg-2":"#102840","bg-3":"#153050","card":"#152a40","card-2":"#102030","line":"#2e5a7a","text":"#e3f2fd","muted":"#90caf9","mint":"#42a5f5","red":"#1976d2","red-hover":"#2196f3","hero":"linear-gradient(125deg, #0d47a1 0%, #1565c0 45%, #42a5f5 100%)","hero-accent":"#90caf9","hero-kicker":"#bbdefb","hero-text":"#e3f2fd","leaf":"☀️","leaf-color":"#ffeb3b"},"fall":{"bg-1":"#1a120b","bg-2":"#2a1c12","bg-3":"#3a2418","card":"#2c1e14","card-2":"#24180f","line":"#5c4033","text":"#f5e6d3","muted":"#c4a882","mint":"#e8a54b","red":"#c45c26","red-hover":"#d46a30","hero":"linear-gradient(125deg, #3d2415 0%, #8b4513 45%, #c45c26 100%)","hero-accent":"#ffb347","hero-kicker":"#ffd7a8","hero-text":"#ffe8c8","leaf":"🍁","leaf-color":"#ffb347"},"winter":{"bg-1":"#0a1520","bg-2":"#102030","bg-3":"#152838","card":"#152030","card-2":"#101820","line":"#3a5068","text":"#e8eef5","muted":"#90a4b8","mint":"#64b5f6","red":"#5c6bc0","red-hover":"#7986cb","hero":"linear-gradient(125deg, #1a237e 0%, #283593 45%, #5c6bc0 100%)","hero-accent":"#9fa8da","hero-kicker":"#c5cae9","hero-text":"#e8eaf6","leaf":"❄️","leaf-color":"#e1f5fe"}},"sort":{"AZ":"🔤 A–Z","VEGAN":"🥬 Vegan-friendly","LOW_RENT":"💰 Lowest rent","HIGH_RENT":"💎 Highest rent","SAFE":"🛡️ Safest","MILD":"🌤️ Mild weather","BIG":"👥 Largest"},"sortModes":["🔤 A–Z","🥬 Vegan-friendly","💰 Lowest rent","💎 Highest rent","🛡️ Safest","🌤️ Mild weather","👥 Largest"],"sortHints":{"🥬 Vegan-friendly":"Ranked by the vegan-options rating in the dataset.","💰 Lowest rent":"Cheapest 1-bedroom rent first.","💎 Highest rent":"Most expensive 1-bedroom rent first.","🛡️ Safest":"Lowest Crime Severity Index first. The index is not a complete measure of personal safety.","🌤️ Mild weather":"Weather ratings are rough estimates from each city's location: coast is mild, interior is moderate, north is cold.","👥 Largest":"Largest 2021 population first."},"climateLabels":{"1":"Mild","2":"Moderate","3":"Cold winters"},"fitIcons":{"Comfortable":"✅","Stretch":"⚠️","Over budget":"❌"},"defaultFeatured":["Vancouver","Victoria","Kelowna"],"creators":"Jonathan Gomes, Joel Opoku Welbeck and Vaidehi Dabhi","myLocation":"📍 My current location","feedbackWho":["Planning to move to BC from another country","Moving within Canada","International student","Already living in BC","Other"],"feedbackFeatures":["Explore cities","Compare","Shortlist","Cost tracker","Newcomer services","Places to visit","Budget planner (Premium)","None of them yet"],"wtp":["No, I wouldn't pay","Up to $3 a month","$3 to $6 a month","More than $6 a month"]}</script>
+<script>
+'use strict';
+/* ====================================================================================================
+   This is BC (phone layout). One file: open it in any browser. Data is embedded below.
+   To collect Feedback answers, paste your Google Apps Script web app address between the quotes.
+   ==================================================================================================== */
+const CONFIG = { feedbackUrl: "" };
+const DEMO_UNLOCK = true;   // The Upgrade button unlocks Premium for the demo. No payments are taken.
+
+const D = JSON.parse(document.getElementById('bc-data').textContent);
+const { cities, jobs: JOBS, extra: EXTRA, places: PLACES, placesData, services: SERVICES, sinOffices: SIN, themes: THEMES,
+        sort: SORT, sortModes: SORT_MODES, sortHints: SORT_HINTS, climateLabels: CLIMATE, fitIcons: FIT_ICONS } = D;
+
+/* ---------- number helpers that match Python (so the numbers equal the web app's) ---------- */
+const pyRound = x => (Math.abs(x % 1) === 0.5 ? 2 * Math.round(x / 2) : Math.round(x));   // Python rounds .5 to the even number
+const int = x => pyRound(x).toLocaleString('en-US');
+const money = x => '$' + int(x);
+const signedMoney = x => (x >= 0 ? '+' : '-') + '$' + int(Math.abs(x));
+const g = x => String(Number(Number(x).toPrecision(6)));                                   // like Python {x:g}
+const titleCase = s => s.replace(/\w\S*/g, w => w[0].toUpperCase() + w.slice(1).toLowerCase());
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const quote = s => encodeURIComponent(s).replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase()).replace(/%2F/g, '/');
+const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : null; };
+const parseNumber = (text, dflt = 0) => { const c = String(text ?? '').replace(/[^\d.]/g, ''); const n = parseFloat(c); return c && Number.isFinite(n) ? n : dflt; };
+
+/* ---------- city logic (ported from the Python app) ---------- */
+const formatPop = v => { const n = parseInt(v, 10); return Number.isFinite(n) ? n.toLocaleString('en-US') : 'Not available'; };
+const getCsi = text => { const m = /CSI\s+(\d+(?:\.\d+)?)/.exec(String(text ?? '')); return m ? parseFloat(m[1]) : null; };
+const csiText = c => { const v = getCsi(c.crime ?? ''); return v === null ? 'Not available' : `${g(v)} (lower is safer)`; };
+const csiHelp = () => 'Crime Severity Index (CSI): lower numbers mean less serious crime. Rough BC mid-size average is around 100–120. Not a complete measure of personal safety.';
+const rentValue = c => { const m = /^\s*\$\s*(\d[\d,]*(?:\.\d+)?)/.exec(String(c.rent1br ?? '')); return m ? parseFloat(m[1].replace(/,/g, '')) : null; };
+const shortRent = c => {
+  const rent = c.rent1br;
+  if (rentValue(c) === null) return rent ? 'Not published' : 'Not available';
+  return typeof rent === 'string' && rent ? rent.replaceAll(' average', '') : (rent ? String(rent) : 'Not available');
+};
+const veganLabel = c => {
+  const raw = String(c.vegan ?? '').trim().toLowerCase();
+  if (!raw || ['not available', 'n/a', 'unknown'].includes(raw)) return 'Not available';
+  const map = { excellent: 'Excellent', good: 'Good', some: 'Some / Limited', limited: 'Limited', few: 'Few' };
+  return map[raw] ?? titleCase(raw);
+};
+const veganScore = value => {
+  const text = String(value ?? '').trim().toLowerCase();
+  if (!text || ['not available', 'n/a', 'unknown'].includes(text)) return null;
+  if (!Number.isNaN(Number(text))) return Number(text);
+  if (/\b(limited|low|few|poor|minimal|little|none|no)\b/.test(text)) return 1;
+  if (/\b(excellent|outstanding|abundant|very high|very good|plenty|many|thriving)\b/.test(text)) return 4;
+  if (/\b(high|great|good|strong|yes|true|decent)\b/.test(text)) return 3;
+  if (/\b(moderate|medium|some|average|growing)\b/.test(text)) return 2;
+  return null;
+};
+const climateTier = c => {
+  const manual = (EXTRA[c.name] || {}).climate_tier;
+  if (manual) return manual;
+  const lat = num(c.lat), lng = num(c.lng);
+  if (lat === null || lng === null) return null;
+  if (lat < 51 && lng < -121.5) return 1;
+  if (lat < 51.5) return 2;
+  return 3;
+};
+const cityPeople = c => c.people || (EXTRA[c.name] || {}).people;
+const cityFoods = c => c.foods || (EXTRA[c.name] || {}).foods;
+const cityJobs = c => c.jobs || JOBS[c.name];
+const cityByName = n => cities.find(c => c.name === n) || null;
+
+const sortValue = (c, mode) => {
+  if (mode === SORT.VEGAN) { const s = veganScore(c.vegan); return s === null ? null : -s; }
+  if (mode === SORT.LOW_RENT) return rentValue(c);
+  if (mode === SORT.HIGH_RENT) { const r = rentValue(c); return r === null ? null : -r; }
+  if (mode === SORT.SAFE) return getCsi(c.crime ?? '');
+  if (mode === SORT.MILD) return climateTier(c);
+  if (mode === SORT.BIG) { const n = parseInt(c.pop2021, 10); return Number.isFinite(n) ? -n : null; }
+  return 0;
+};
+const nameKey = c => String(c.name ?? '').toLowerCase();
+const cmpStr = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+const sortCities = (items, mode) => {
+  const scored = items.map(c => [sortValue(c, mode), c]);
+  const ranked = scored.filter(p => p[0] !== null).sort((a, b) => (a[0] - b[0]) || cmpStr(nameKey(a[1]), nameKey(b[1])));
+  const missing = scored.filter(p => p[0] === null).map(p => p[1]).sort((a, b) => cmpStr(nameKey(a), nameKey(b)));
+  return ranked.map(p => p[1]).concat(missing);
+};
+const sortBadge = (c, mode) => {
+  if (mode === SORT.VEGAN) { const v = veganLabel(c); return v !== 'Not available' ? `🥬 ${v}` : '🥬 No data'; }
+  if (mode === SORT.LOW_RENT || mode === SORT.HIGH_RENT) return `💰 ${shortRent(c)}`;
+  if (mode === SORT.SAFE) { const v = getCsi(c.crime ?? ''); return v !== null ? `🛡️ CSI ${g(v)} (↓ safer)` : '🛡️ No data'; }
+  if (mode === SORT.MILD) { const t = climateTier(c); return t ? `🌤️ ${CLIMATE[t]}` : '🌤️ No data'; }
+  if (mode === SORT.BIG) return `👥 ${formatPop(c.pop2021)}`;
+  return '';
+};
+
+const haversineKm = (lat1, lon1, lat2, lon2) => {
+  const r = x => x * Math.PI / 180, p1 = r(lat1), p2 = r(lat2), dlat = p2 - p1, dlon = r(lon2 - lon1);
+  const a = Math.sin(dlat / 2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dlon / 2) ** 2;
+  return 2 * 6371.0 * Math.asin(Math.sqrt(a));
+};
+const distanceText = km => (km < 1 ? 'under 1 km' : `about ${int(km)} km`);
+const nearestOffices = (lat, lng, count = 3) =>
+  SIN.map(o => [o, haversineKm(lat, lng, o.lat, o.lng)]).sort((a, b) => a[1] - b[1]).slice(0, count);
+const officeDirectionsLinks = (office, origin) => {
+  const target = quote(`Service Canada Centre, ${office.address}`);
+  let google = `https://www.google.com/maps/dir/?api=1&destination=${target}`, apple = `https://maps.apple.com/?daddr=${target}`;
+  if (origin) { const [lat, lng] = origin; google += `&origin=${lat.toFixed(5)},${lng.toFixed(5)}`; apple += `&saddr=${lat.toFixed(5)},${lng.toFixed(5)}`; }
+  return [google, apple];
+};
+const mapLinks = (term, cityName, coords) => {
+  if (coords) {
+    const [lat, lng] = coords;
+    return [`https://www.google.com/maps/search/${quote(term)}/@${lat.toFixed(5)},${lng.toFixed(5)},13z`, `https://maps.apple.com/?q=${quote(term)}&ll=${lat.toFixed(5)},${lng.toFixed(5)}`];
+  }
+  const query = quote(cityName ? `${term} in ${cityName}, British Columbia` : `${term} near me`);
+  return [`https://www.google.com/maps/search/?api=1&query=${query}`, `https://maps.apple.com/?q=${query}`];
+};
+const normalizePlaces = raw => {
+  if (raw && !Array.isArray(raw) && typeof raw === 'object') raw = Object.values(raw).filter(Array.isArray).flat();
+  const out = [];
+  for (const item of raw || []) {
+    let name, desc, address;
+    if (typeof item === 'string') { name = item; desc = ''; address = ''; }
+    else if (item && typeof item === 'object') { name = item.name || item.title || ''; desc = item.description || item.desc || item.type || item.category || ''; address = item.address || ''; }
+    else continue;
+    if (name) out.push({ name: String(name), desc: String(desc), address: String(address) });
+  }
+  return out;
+};
+const getPlaces = c => {
+  const name = c.name || '';
+  let fromData = placesData ? placesData[name] : undefined;
+  if (fromData === undefined && placesData) { const k = Object.keys(placesData).find(k => k.toLowerCase() === name.toLowerCase()); fromData = k ? placesData[k] : undefined; }
+  const found = normalizePlaces(c.places || fromData);
+  return found.length ? found : normalizePlaces(PLACES[name]);
+};
+const directionsLinks = (placeName, cityName, address = '') => {
+  const q = quote(address ? `${placeName}, ${address}` : `${placeName}, ${cityName}, British Columbia`);
+  return [`https://www.google.com/maps/dir/?api=1&destination=${q}`, `https://maps.apple.com/?daddr=${q}`];
+};
+const rentFit = (rent, income, share) => {
+  if (rent === null || !income || income <= 0) return null;
+  const pct = rent / income * 100;
+  return [pct, pct <= share ? 'Comfortable' : pct <= share + 10 ? 'Stretch' : 'Over budget'];
+};
+
+const compareRows = chosen => {
+  const row = fn => Object.fromEntries(chosen.map(c => [c.name, String(fn(c) || 'Not available')]));
+  return [
+    ['Population (2021)', row(c => formatPop(c.pop2021))],
+    ['1-bedroom rent', row(c => c.rent1br)],
+    ['Cost of living', row(c => c.cost)],
+    ['Crime Severity Index', row(csiText)],
+    ['Vegan options', row(veganLabel)],
+    ['Region', row(c => c.region)],
+    ['People', row(cityPeople)],
+    ['Local foods', row(cityFoods)],
+    ['Dominant jobs (approximate)', row(cityJobs)],
+    ['Lifestyle notes', row(c => ((EXTRA[c.name] || {}).good_for || []).join(', ') || 'Not yet available')],
+  ];
+};
+const quickAdvice = chosen => {
+  const scored = [];
+  for (const c of chosen) {
+    const rent = rentValue(c), csi = getCsi(c.crime ?? '');
+    if (rent !== null && csi !== null) scored.push([c.name, rent, csi, rent / 100 + csi]);
+  }
+  if (scored.length === 1) return [`Only one city has both rent and crime data: ${scored[0][0]}. Add another city for a comparison.`];
+  if (scored.length < 2) return ['Add cities that have both rent and crime data to see advice.'];
+  scored.sort((a, b) => a[3] - b[3]);
+  const best = scored[0];
+  const lines = [`Best balance of rent and safety: ${best[0]} (rent about ${money(best[1])}, CSI ${g(best[2])}).`];
+  const minBy = i => scored.reduce((m, s) => (s[i] < m[i] ? s : m), scored[0]);
+  const safest = minBy(2), cheapest = minBy(1);
+  if (safest[0] !== best[0]) lines.push(`Safest option: ${safest[0]} (CSI ${g(safest[2])}).`);
+  if (cheapest[0] !== best[0]) lines.push(`Lowest rent: ${cheapest[0]} (about ${money(cheapest[1])}/month).`);
+  if (scored.length === 2) {
+    const [a, b] = scored, cheaper = a[1] <= b[1] ? a : b, safer = a[2] <= b[2] ? a : b;
+    const rentDiff = Math.abs(a[1] - b[1]), csiDiff = Math.abs(a[2] - b[2]);
+    if (cheaper[0] !== safer[0] && rentDiff > 200 && csiDiff > 10)
+      lines.push(`Trade-off: ${cheaper[0]} is cheaper by about ${money(rentDiff)}, but ${safer[0]} has a lower crime score by ${g(csiDiff)} points.`);
+  }
+  return lines;
+};
+
+const COST_PCT = { 'Rent (1-bedroom)': 0.30, 'Groceries': 0.12, 'Transit / transport': 0.05, 'Utilities & internet': 0.05, 'Phone': 0.02, 'Entertainment & dining': 0.06 };
+const COST_TIPS = [['Rent', 'Look for cheaper rent or a roommate.'], ['Groceries', 'Meal planning or cheaper stores can help.'],
+  ['Transit', 'Consider transit passes or reducing rideshares.'], ['Utilities', 'Check for better internet/utility plans.'], ['Phone', 'Compare phone plans.']];
+const typicalCosts = city => {
+  const est = rentValue(city), rent = est !== null ? est : 1500;
+  const level = String(city.cost || 'Medium').toLowerCase();
+  const m = level.includes('very high') ? 1.25 : level.includes('high') ? 1.1 : level.includes('low') ? 0.9 : 1.0;
+  return [{ 'Rent (1-bedroom)': rent, 'Groceries': pyRound(450 * m), 'Transit / transport': pyRound(120 * m), 'Utilities & internet': pyRound(180 * m),
+    'Phone': 60, 'Entertainment & dining': pyRound(200 * m) }, est === null];
+};
+const costSummary = (city, income, actual) => {
+  const [typical, rentMissing] = typicalCosts(city);
+  const typicalTotal = Object.values(typical).reduce((s, v) => s + v, 0);
+  const actualTotal = Object.keys(typical).reduce((s, k) => s + (Number(actual[k]) || 0), 0);
+  const out = { typical, typicalTotal, rentMissing, actualTotal, income, messages: [],
+    typicalPct: income > 0 ? typicalTotal / income * 100 : null, leftTypical: income - typicalTotal,
+    spentPct: income > 0 ? actualTotal / income * 100 : null, left: income - actualTotal, vsTypical: actualTotal - typicalTotal };
+  if (income <= 0 || actualTotal <= 0) { out.messages.push(['info', 'Enter your income and at least some spending to get personalized advice.']); return out; }
+  const over = [];
+  for (const [item, typ] of Object.entries(typical)) {
+    const spent = Number(actual[item]) || 0;
+    if (spent > 0) { const rec = income * (COST_PCT[item] ?? 0.05); if (spent > rec * 1.15 && spent > typ * 1.1) over.push([item, spent, rec]); }
+  }
+  over.sort((a, b) => (b[1] - b[2]) - (a[1] - a[2]));
+  const sp = out.spentPct;
+  if (actualTotal > income) out.messages.push(['error', `You’re spending ${money(actualTotal - income)} more than you earn. This isn’t sustainable. Focus on the biggest categories below first.`]);
+  for (const [item, spent, rec] of over) {
+    const tip = (COST_TIPS.find(([k]) => item.includes(k)) || [0, 'Cooking more at home or free local activities can reduce this.'])[1];
+    out.messages.push(['warning', `${item}: you spent ${money(spent)}. A common guideline is about ${money(rec)} (${int(COST_PCT[item] * 100)}% of income). That’s roughly ${money(spent - rec)} over. ${tip}`]);
+  }
+  if (!over.length && sp <= 70) out.messages.push(['success', 'No major overspending detected against common guidelines. Nice work.']);
+  if (sp > 85 && sp <= 100) out.messages.push(['error', 'You’re spending over 85% of your income. Consider cutting the highest categories or increasing income.']);
+  else if (sp > 70 && sp <= 85) out.messages.push(['warning', 'Spending is high relative to income. Focus on the categories flagged above.']);
+  return out;
+};
+const budgetRows = (pool, income, other, share) => {
+  const rows = []; let comfortable = 0;
+  for (const c of pool) {
+    const rent = rentValue(c), fit = rentFit(rent, income, share);
+    if (!fit) continue;
+    const [pct, label] = fit;
+    if (label === 'Comfortable') comfortable++;
+    rows.push({ city: c.name || 'Unknown', rent, pct, label, icon: FIT_ICONS[label], left: income - rent - other });
+  }
+  rows.sort((a, b) => a.rent - b.rent);
+  return [rows, comfortable, pool.length - rows.length];
+};
+const shortlistRows = (saved, budget) => saved.map(c => {
+  const t = climateTier(c);
+  const row = { City: c.name || '', Region: c.region || '', 'Population (2021)': formatPop(c.pop2021), '1-bedroom rent': shortRent(c),
+    'Cost of living': String(c.cost || 'Not available'), 'Crime Severity Index': csiText(c), 'Dominant jobs (approximate)': String(cityJobs(c) || 'Not available'),
+    'Vegan options': titleCase(String(c.vegan || 'Not available')), Weather: t ? CLIMATE[t] : 'Not available' };
+  if (budget) {
+    const fit = rentFit(rentValue(c), budget.income, budget.share);
+    row['Rent as % of income'] = fit ? `${int(fit[0])}%` : 'Not available';
+    row['Fit with your budget'] = fit ? fit[1] : 'Not available';
+  }
+  return row;
+});
+const todayText = () => { const d = new Date(); return `${d.toLocaleString('en-US', { month: 'long' })} ${d.getDate()}, ${d.getFullYear()}`; };
+const reportText = (saved, budget) => {
+  const lines = [`This is BC: my city shortlist (${todayText()})`, ''];
+  if (budget) lines.push(`Budget: take-home ${money(budget.income)}/month, up to ${budget.share}% on rent (${money(budget.income * budget.share / 100)}/month).`, '');
+  for (const r of shortlistRows(saved, budget)) {
+    lines.push(`${r.City} (${r.Region || 'British Columbia'})`, `  Rent: ${r['1-bedroom rent']} | Cost of living: ${r['Cost of living']}`,
+      `  Crime Severity Index: ${r['Crime Severity Index']} | Weather: ${r.Weather}`, `  Dominant jobs (approximate): ${r['Dominant jobs (approximate)']}`);
+    if (r['Fit with your budget']) lines.push(`  Budget fit: ${r['Fit with your budget']} (${r['Rent as % of income']} of income)`);
+    lines.push('');
+  }
+  lines.push('Information is a starting point, not official advice. Figures may be out of date, so verify important details.');
+  return lines.join('\n');
+};
+const searchMatches = (query, limit = 6) => {
+  const q = String(query ?? '').trim().toLowerCase();
+  if (!q) return [];
+  const names = cities.map(c => c.name).filter(Boolean).sort();
+  const regions = [...new Set(cities.map(c => c.region).filter(Boolean))].sort();
+  const scored = [];
+  for (const n of names) { const l = n.toLowerCase(); if (l.includes(q)) scored.push([l.startsWith(q) ? 0 : 1, n, 'city']); }
+  for (const r of regions) if (r.toLowerCase().includes(q)) scored.push([2, r, 'region']);
+  scored.sort((a, b) => (a[0] - b[0]) || cmpStr(a[1], b[1]));
+  return scored.slice(0, limit).map(s => [s[1], s[2]]);
+};
+const getSeason = (d = new Date()) => {
+  const m = d.getMonth() + 1, day = d.getDate();
+  if ((m === 3 && day >= 20) || m === 4 || m === 5 || (m === 6 && day < 21)) return 'spring';
+  if ((m === 6 && day >= 21) || m === 7 || m === 8 || (m === 9 && day < 22)) return 'summer';
+  if ((m === 9 && day >= 22) || m === 10 || m === 11 || (m === 12 && day < 21)) return 'fall';
+  return 'winter';
+};
+
+/* ---------- state ---------- */
+const STORE_KEY = 'thisisbc.v1';
+const FIRST_TIME = 'First time today', USED_BEFORE = 'Yes, I’ve used it before';
+const names = cities.map(c => c.name).filter(Boolean);
+const stored = (() => { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch { return {}; } })();
+const state = {
+  route: 'home', theme: THEMES[stored.theme] ? stored.theme : getSeason(),
+  shortlist: (stored.shortlist || []).filter(n => names.includes(n)), pending: Array.isArray(stored.pending) ? stored.pending : [],
+  compare: [], premium: false, showDiff: false,
+  q: '', sort: SORT.AZ, region: '', savedOnly: false,
+  featured: D.defaultFeatured.filter(n => names.includes(n)).length ? D.defaultFeatured.filter(n => names.includes(n)) : names.slice(0, 3),
+  costCity: names[0], costIncome: 3500, costActual: {},
+  servicesCity: null, myLoc: null,
+  budIncome: 3500, budOther: 1200, budShare: 30, budget: null,
+  fb: null, fbSent: false, fbStatus: null,
+};
+const newFeedback = () => ({ who: '', helped: 3, useful: '', used: FIRST_TIME, pay: D.wtp[0], missing: '' });
+state.fb = newFeedback();
+const persist = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify({ shortlist: state.shortlist, theme: state.theme, pending: state.pending })); } catch { /* private mode: fine */ } };
+
+/* ---------- theme ---------- */
+const applyTheme = () => {
+  const t = THEMES[state.theme], root = document.documentElement.style;
+  const map = { bg1: 'bg-1', bg2: 'bg-2', bg3: 'bg-3', card: 'card', card2: 'card-2', line: 'line', text: 'text', muted: 'muted', mint: 'mint', red: 'red',
+    redh: 'red-hover', hero: 'hero', heroAccent: 'hero-accent', heroKicker: 'hero-kicker', heroText: 'hero-text' };
+  for (const [css, key] of Object.entries(map)) root.setProperty('--' + css, t[key]);
+  const meta = document.querySelector('meta[name=theme-color]');
+  if (meta) meta.setAttribute('content', t['bg-2']);
+};
+
+/* ---------- small UI helpers ---------- */
+const $ = s => document.querySelector(s);
+let toastTimer;
+const toast = msg => { const el = $('#toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2600); };
+const heading = (title, sub) => `<h1>${esc(title)}</h1>${sub ? `<p class="sub">${esc(sub)}</p>` : ''}`;
+const back = (label, route) => `<div><button class="btn plain" data-act="go" data-a="${route}">← ${esc(label)}</button></div>`;
+const note = (level, text) => `<div class="note ${level}">${esc(text)}</div>`;
+const metric = (label, value) => `<div class="metric"><small>${esc(label)}</small><b>${esc(value)}</b></div>`;
+const link = (label, url, cls = 'link') => `<a class="btn ${cls}" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(label)}</a>`;
+const btn = (label, act, a = '', cls = '', extra = '') => `<button class="btn ${cls}" data-act="${act}" data-a="${esc(a)}" ${extra}>${esc(label)}</button>`;
+const options = (list, value, placeholder, fmt = x => x) => (placeholder ? `<option value="">${esc(placeholder)}</option>` : '') +
+  list.map(o => `<option value="${esc(o)}"${o === value ? ' selected' : ''}>${esc(fmt(o))}</option>`).join('');
+const select = (label, ch, list, value, placeholder, fmt) => `<label class="field"><span>${esc(label)}</span><select data-ch="${ch}">${options(list, value, placeholder, fmt)}</select></label>`;
+const disclaimer = (t = 'Information is a starting point, not official advice. Verify details before deciding.') => `<p class="footer">${esc(t)}</p>`;
+
+/* ---------- cards ---------- */
+const cityRow = (c, badge = '') => {
+  const n = c.name || 'Unknown city', saved = state.shortlist.includes(n), cmp = state.compare.includes(n);
+  const pop = c.pop2021;
+  return `<article class="card"><div><h3>${esc(n)}</h3><p class="muted sm">${esc(c.region || 'British Columbia')}</p></div>
+    ${badge ? `<p class="badge">${esc(badge)}</p>` : ''}
+    <p class="sm">💰 ${esc(shortRent(c))} · Cost of living ${esc(c.cost || 'Not available')}</p>
+    <p class="muted xs">${pop ? `👥 ${esc(formatPop(pop))} people (2021)` : 'Population data not available'}</p>
+    <div class="row">${btn('Open', 'open', n, 'primary')}${btn(saved ? '★ Saved' : '☆ Save', 'save', n)}
+    ${btn(cmp ? '✓ Comparing' : 'Compare', 'cmp', n, '', !cmp && state.compare.length >= 3 ? 'disabled' : '')}</div></article>`;
+};
+const premiumLock = (key, headline, blurb, points = []) => `<div class="card lock"><div class="big">🔒</div><h3>${esc(headline)}</h3><p class="sub">${esc(blurb)}</p>
+  ${points.length ? `<ul>${points.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}${btn('⭐ Upgrade to Premium', 'upgrade', key, 'primary full')}</div>`;
+const premiumBar = () => `<div class="row" style="align-items:center;justify-content:space-between"><span class="muted xs">⭐ Premium is active for this demo session.</span>${btn('Back to free', 'free', '', 'plain')}</div>`;
+
+/* ---------- screens ---------- */
+const views = {};
+views.home = () => {
+  const t = THEMES[state.theme];
+  const features = [['🏙️ Discover communities', 'Browse cities and learn about population, rent, lifestyle and more.', 'explore'],
+    ['⚖️ Compare your options', 'Put up to three cities side by side to understand the differences.', 'compare'],
+    ['🪪 Newcomer services', 'Find official info and the nearest offices for SIN, MSP and more.', 'services']];
+  return `<section class="hero"><div class="leaf">${t.leaf}</div><p class="kicker">A better way to discover British Columbia</p>
+    <h1>Find your place in British Columbia.</h1>
+    <p>Explore communities, compare everyday costs, discover local lifestyle options and build a shortlist of places that could feel like home.</p></section>
+    <h2>What matters most in your next home?</h2>
+    <label class="field"><span class="sub">Start with a city, or explore places that match your priorities.</span>
+      <input type="search" id="home-q" data-in="homeq" placeholder="Start typing a city, e.g. “van” for Vancouver" autocomplete="off"></label>
+    <div id="home-sugg"></div>
+    ${btn('Browse all cities →', 'go', 'explore', 'primary full')}
+    <h2>Explore BC your way</h2>
+    ${features.map(([h, b, r]) => `<div class="card"><h3>${esc(h)}</h3><p class="sub">${esc(b)}</p>${btn('Get started →', 'go', r)}</div>`).join('')}
+    <h2>A few places to get you started</h2>
+    ${state.featured.map(cityByName).filter(Boolean).map(c => cityRow(c)).join('')}
+    ${btn('🔀 Shuffle', 'shuffle')}${disclaimer()}`;
+};
+views.explore = () => {
+  const regions = [...new Set(cities.map(c => c.region).filter(Boolean))].sort();
+  return `${heading('Explore communities', 'Search for a city or browse every community below.')}
+    <label class="field"><span>Search a city or region</span><input type="search" id="ex-q" data-in="exq" value="${esc(state.q)}" placeholder="e.g. “kel” for Kelowna" autocomplete="off"></label>
+    <div class="chips" role="group" aria-label="View cities by">${SORT_MODES.map(m => `<button class="chip" data-act="sort" data-a="${esc(m)}" aria-pressed="${m === state.sort}">${esc(m)}</button>`).join('')}</div>
+    ${select('Region', 'region', regions, state.region, 'All regions')}
+    <label class="switch"><input type="checkbox" data-ch="savedOnly" ${state.savedOnly ? 'checked' : ''}> Saved cities only</label>
+    <div id="ex-results" class="screen-list" style="display:flex;flex-direction:column;gap:10px">${exploreList()}</div>`;
+};
+const exploreList = () => {
+  const q = state.q.trim().toLowerCase();
+  let items = cities.filter(c => (!state.region || c.region === state.region) && (!state.savedOnly || state.shortlist.includes(c.name)) &&
+    (!q || (c.name || '').toLowerCase().includes(q) || (c.region || '').toLowerCase().includes(q)));
+  items = sortCities(items, state.sort);
+  const head = `<p class="muted xs">Showing ${items.length} of ${cities.length} communities</p>${SORT_HINTS[state.sort] ? `<p class="muted xs">${esc(SORT_HINTS[state.sort])}</p>` : ''}`;
+  return head + (items.length ? items.map(c => cityRow(c, sortBadge(c, state.sort))).join('') : note('info', 'No matching cities found. Try a different region or turn off the filters.'));
+};
+views.city = name => {
+  const c = cityByName(name);
+  if (!c) return views.explore();
+  const extra = EXTRA[c.name] || {}, people = cityPeople(c), foods = cityFoods(c), jobs = cityJobs(c), csi = getCsi(c.crime ?? ''), tier = climateTier(c);
+  const saved = state.shortlist.includes(c.name), cmp = state.compare.includes(c.name);
+  const facts = [];
+  if (people) facts.push(`👥 People: ${people}`);
+  facts.push(`🥬 Vegan options: ${veganLabel(c)}`);
+  if (csi !== null) facts.push(`📊 Crime Severity Index: ${g(csi)} (lower is safer)`); else if (c.crime) facts.push(`📊 Crime: ${c.crime}`);
+  if (foods) facts.push(`🍽️ Local foods: ${foods}`);
+  if (jobs) facts.push(`💼 Dominant jobs (approximate): ${jobs}`);
+  if (extra.climate) facts.push(`🌤️ Climate: ${extra.climate}`); else if (tier) facts.push(`🌡️ Weather: ${CLIMATE[tier]} (estimated from location)`);
+  if (extra.transit) facts.push(`🚇 Transit: ${extra.transit}`);
+  if (extra.good_for) facts.push(`✨ Good for: ${extra.good_for.join(', ')}`);
+  const places = getPlaces(c);
+  const [gMore, aMore] = mapLinks(`things to do in ${c.name}, British Columbia`);
+  let html = `${back('All cities', 'explore')}<div><p class="muted sm">${esc(c.region || 'British Columbia')}</p><h1>${esc(c.name)}</h1></div>
+    <div class="metrics">${metric('1-bedroom rent', shortRent(c))}${metric('Cost of living', String(c.cost || 'Not available'))}
+    ${metric('Population (2021)', formatPop(c.pop2021))}${metric('Crime Severity Index', csiText(c))}</div>
+    <p class="footer">${esc(csiHelp())}</p>
+    ${rentValue(c) === null && c.rent1br ? `<p class="muted sm">🏠 Rent: ${esc(c.rent1br)}</p>` : ''}${c.rentSource ? `<p class="footer">Rent source: ${esc(c.rentSource)}</p>` : ''}
+    <div class="card"><div class="facts-list">${facts.map(f => `<div>${esc(f)}</div>`).join('')}</div></div>`;
+  const links = [extra.forecast && link('🌤️ Weather', extra.forecast), extra.vanscene && link('🌆 Vanscene', extra.vanscene)].filter(Boolean);
+  if (links.length) html += `<div class="row">${links.join('')}</div>`;
+  html += `<h2>📍 Places to visit</h2>${places.length ? '<p class="muted xs">Tap a maps button to start directions. Your maps app will ask to use your location.</p>' : ''}`;
+  for (const p of places) {
+    const [gm, am] = directionsLinks(p.name, c.name, p.address);
+    html += `<div class="card place"><h3>${esc(p.name)}</h3>${p.desc ? `<p class="muted sm">${esc(p.desc)}</p>` : ''}<div class="row">${link('🧭 Google Maps', gm)}${link('🧭 Apple Maps', am)}</div></div>`;
+  }
+  html += `<p class="muted xs">Want more ideas? Search maps for things to do in ${esc(c.name)}.</p><div class="row">${link('🔎 More in Google Maps', gMore)}${link('🔎 More in Apple Maps', aMore)}</div>`;
+  if (foods) {
+    const [gf, af] = mapLinks(foods, c.name);
+    html += `<h2>🍽️ Find places to eat</h2><p class="muted xs">Search for: ${esc(foods)}</p><div class="row">${link('Open in Google Maps', gf)}${link('Open in Apple Maps', af)}</div>`;
+  }
+  return html + `<div class="row">${btn(saved ? '★ Saved' : '☆ Save city', 'save', c.name, saved ? '' : 'primary')}${btn(cmp ? '✓ In compare' : 'Add to compare', 'cmp', c.name, '', !cmp && state.compare.length >= 3 ? 'disabled' : '')}</div>
+    ${disclaimer('Explore the available city information before making a decision.')}`;
+};
+views.compare = () => {
+  const chosen = state.compare.map(cityByName).filter(Boolean);
+  let html = heading('Compare communities', 'Compare up to three places using the data currently available.');
+  if (state.compare.length < 3) html += select('Add a city', 'cmpadd', names.filter(n => !state.compare.includes(n)).sort(), '', 'Choose a city');
+  if (!chosen.length) return html + note('info', 'Choose one or more cities above to begin comparing. You can also add cities from Explore.');
+  html += `<div class="row">${chosen.map(c => btn('✕ ' + c.name, 'cmpdel', c.name)).join('')}</div>
+    <label class="switch"><input type="checkbox" data-ch="showDiff" ${state.showDiff ? 'checked' : ''}> Show differences only</label>`;
+  for (const [label, values] of compareRows(chosen)) {
+    if (state.showDiff && new Set(Object.values(values)).size <= 1) continue;
+    html += `<div class="card"><h3 style="font-size:14px;color:var(--mint)">${esc(label)}</h3>${Object.entries(values).map(([n, v]) => `<p class="sm"><b>${esc(n)}</b>: ${esc(v)}</p>`).join('')}</div>`;
+  }
+  return html + `<h2>Quick advice</h2>${quickAdvice(chosen).map(l => note('info', l)).join('')}
+    ${disclaimer('Advice uses only 1-bedroom rent and Crime Severity Index from the dataset. Lower CSI is safer. Consider lifestyle, jobs and other factors too.')}`;
+};
+views.shortlist = () => {
+  const saved = state.shortlist.map(cityByName).filter(Boolean);
+  let html = heading('Your saved places', 'Keep the communities you are interested in together.');
+  if (!saved.length) return html + note('info', 'You haven’t saved any cities yet. Open a city and tap ☆ Save city to build your shortlist.') + btn('Explore cities →', 'go', 'explore', 'primary full');
+  html += `<p class="muted xs">${saved.length} saved ${saved.length === 1 ? 'community' : 'communities'}</p>${saved.map(c => cityRow(c)).join('')}
+    <h2>Shortlist summary ⭐</h2><p class="sub">Share your saved cities as a summary you can paste into a message.</p>`;
+  if (state.premium) {
+    html += btn('📤 Share my shortlist', 'share', '', 'primary full') +
+      `<p class="muted xs">${state.budget ? 'Your Budget planner numbers are included.' : 'Fill in the Budget planner first to add affordability to the summary.'}</p>${premiumBar()}`;
+  } else html += premiumLock('report', 'Premium feature', 'Upgrade to share your shortlist as a summary.', ['A summary with rent, cost, safety, weather and jobs', 'Includes your Budget planner results']);
+  return html;
+};
+const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+let installPrompt = null;
+const installCard = () => {
+  if (isStandalone()) return '';
+  const how = installPrompt ? btn('Install app', 'install', '', 'primary')
+    : isIos() ? '<p class="sm">On iPhone: tap the Share button, then Add to Home Screen.</p>'
+    : '<p class="sm">Open your browser menu and choose Add to Home screen or Install app.</p>';
+  return `<div class="card"><h3>Install on your phone</h3><p class="sub">Put This is BC on your home screen. It opens full-screen and keeps working without internet.</p>${how}</div>`;
+};
+views.more = () => `${heading('More', 'Tools and settings')}
+  ${btn('🧮 Cost tracker', 'go', 'cost', 'full')}${btn('🪪 Newcomer services', 'go', 'services', 'full')}${btn('💰 Budget planner ⭐', 'go', 'budget', 'full')}
+  ${btn('🤖 Rent advisor ⭐', 'go', 'advisor', 'full')}${btn('💬 Feedback', 'go', 'feedback', 'full')}
+  ${select('Theme', 'theme', Object.keys(THEMES), state.theme, '', titleCase)}
+  ${installCard()}
+  <div class="card about"><p><b>This is BC</b> helps newcomers, students and anyone thinking about moving to British Columbia find a place that fits.</p>
+  <p>Explore communities and compare rent, safety, weather, jobs and lifestyle. Find places to visit and get directions. Find the nearest offices for newcomer services like your SIN. Plan your budget with Premium tools.</p>
+  <p><b>Created by</b> ${esc(D.creators)}.</p>
+  <p><b>Special thanks</b><br>VanScene (the Vancouver scene map) was created by another student group. It helps people in Vancouver explore and choose safer places to live. We linked to their project with permission.</p>
+  <p class="muted xs">Information is a starting point, not official advice. Check source dates and verify important details before you decide.</p></div>`;
+views.cost = () => {
+  const city = cityByName(state.costCity), actual = state.costActual[state.costCity] || (state.costActual[state.costCity] = {});
+  const [typical] = typicalCosts(city);
+  return `${back('More', 'more')}${heading('Cost tracker', 'Enter your income and spending to see where you might be overspending.')}
+    ${select('Choose a city', 'costCity', names, state.costCity)}
+    <label class="field"><span>Your monthly take-home income ($)</span><input type="number" inputmode="decimal" min="0" step="100" data-in="costIncome" value="${state.costIncome}"></label>
+    <h2 style="font-size:16px">Your actual spending this month</h2>
+    ${Object.keys(typical).map(k => `<label class="field"><span>${esc(k)} ($)</span><input type="number" inputmode="decimal" min="0" step="10" data-in="cost:${esc(k)}" value="${actual[k] || ''}" placeholder="0"></label>`).join('')}
+    <div id="cost-results" style="display:flex;flex-direction:column;gap:10px">${costResults()}</div>`;
+};
+const costResults = () => {
+  const city = cityByName(state.costCity), s = costSummary(city, state.costIncome, state.costActual[state.costCity] || {});
+  let html = `<h3>Typical costs in ${esc(city.name)} · Cost level: ${esc(city.cost || 'Not available')}</h3>`;
+  if (s.rentMissing) html += `<p class="muted xs">No rent data for ${esc(city.name)}, so rent uses a $1,500 placeholder.</p>`;
+  html += `<div class="metrics three">${metric('Typical total', money(s.typicalTotal))}${s.typicalPct !== null ? metric('As % of income', int(s.typicalPct) + '%') + metric('Left after typical', money(s.leftTypical)) : ''}</div>`;
+  if (s.spentPct !== null && s.actualTotal > 0)
+    html += `<div class="metrics three">${metric('You spent', money(s.actualTotal))}${metric('Left this month', money(s.left))}${metric('Vs typical', signedMoney(s.vsTypical))}</div><h2>Where to cut costs</h2>`;
+  return html + s.messages.map(([l, t]) => note(l, t)).join('') + disclaimer('Guidelines are approximate (for example about 30% on rent). Not financial advice.');
+};
+views.services = () => {
+  const useLoc = Boolean(state.myLoc) && state.servicesCity === D.myLocation;
+  if (!useLoc && !names.includes(state.servicesCity)) state.servicesCity = state.shortlist.find(n => names.includes(n)) || names[0];
+  const city = useLoc ? null : cityByName(state.servicesCity);
+  const ref = useLoc ? state.myLoc : (num(city.lat) !== null && num(city.lng) !== null ? [num(city.lat), num(city.lng)] : null);
+  const refLabel = useLoc ? 'your location' : city.name;
+  const placeList = (state.myLoc ? [D.myLocation] : []).concat(names);
+  const cityName = useLoc ? null : city.name;
+  let html = `${back('More', 'more')}${heading('Newcomer services', 'Find official information and the closest office for each service.')}
+    <button class="btn full" data-act="locate">📍 Use my location</button>
+    ${select('Find offices near', 'servicesCity', placeList, state.servicesCity)}`;
+  for (const s of SERVICES) {
+    const [gm, am] = mapLinks(s.term, cityName, useLoc ? state.myLoc : null);
+    html += `<div class="card"><h3>${esc(s.title)}</h3><p class="sub">${esc(s.desc)}</p>`;
+    if (s.title === D.sinTitle && ref) {
+      const offices = nearestOffices(ref[0], ref[1], 3), [top, km] = offices[0], origin = useLoc ? state.myLoc : null;
+      const [tg, ta] = officeDirectionsLinks(top, origin);
+      html += `<p><b>📍 Nearest office: Service Canada Centre ${esc(top.name)}</b></p>
+        <p class="muted xs">${esc(top.address)} · ${esc(distanceText(km))} from ${esc(refLabel)}, in a straight line${top.note ? ' · ' + esc(top.note) : ''}</p>
+        <div class="row">${link('🧭 Google Maps', tg)}${link('🧭 Apple Maps', ta)}</div><p class="sm"><b>Other nearby offices</b></p>`;
+      for (const [o, d] of offices.slice(1)) {
+        const [og, oa] = officeDirectionsLinks(o, origin);
+        html += `<p class="sm"><b>${esc(o.name)}</b></p><p class="muted xs">${esc(o.address)} · ${esc(distanceText(d))} away${o.note ? ' · ' + esc(o.note) : ''}</p><div class="row">${link('🧭 Google Maps', og)}${link('🧭 Apple Maps', oa)}</div>`;
+      }
+      html += `<div class="row">${link('Official info →', s.url)}${link('Office details and hours', 'https://offices.service.canada.ca/en/Office/' + top.id)}</div>
+        <p class="footer">Distances are straight-line estimates. Check the office page for hours and whether you need an appointment. You can also apply for a SIN online or by mail.</p>`;
+    } else {
+      html += `<p class="muted xs">Map search: ${esc(s.term)} ${esc(useLoc ? 'near your location' : 'in ' + city.name)}</p><div class="row">${link('Official info →', s.url)}${link('📍 Google Maps', gm)}${link('📍 Apple Maps', am)}</div>`;
+    }
+    html += '</div>';
+  }
+  return html + disclaimer('Offices differ in what they handle, and many need an appointment or specific documents. Check hours and requirements on the official page before you go.');
+};
+views.budget = () => {
+  let html = `${back('More', 'more')}${heading('Budget planner ⭐', 'Enter your income to see which BC cities fit your budget.')}`;
+  if (!state.premium) return html + premiumLock('planner', 'Upgrade to Premium to use this service', 'The Budget planner is a Premium feature.',
+    ['See which cities fit your income', 'Check rent as a share of your take-home pay', 'See what’s left each month after rent and other costs', 'Add your numbers to the shortlist summary']);
+  state.budget = { income: state.budIncome, share: state.budShare, other: state.budOther };
+  return html + `<label class="field"><span>Monthly take-home income ($)</span><input type="number" inputmode="decimal" min="0" step="100" data-in="budIncome" value="${state.budIncome}"></label>
+    <label class="field"><span>Other monthly costs ($)</span><input type="number" inputmode="decimal" min="0" step="50" data-in="budOther" value="${state.budOther}"></label>
+    <label class="field"><span>Share of income you want to spend on rent: <b id="bud-share">${state.budShare}</b>%</span><input type="range" min="20" max="50" step="5" value="${state.budShare}" data-in="budShare"></label>
+    <div id="bud-results" style="display:flex;flex-direction:column;gap:10px">${budgetResults()}</div>${premiumBar()}`;
+};
+const budgetResults = () => {
+  const { budIncome: income, budOther: other, budShare: share } = state;
+  if (income <= 0) return note('info', 'Enter your monthly take-home income to see which cities fit.');
+  const [rows, comfortable, missing] = budgetRows(cities, income, other, share);
+  let html = `<div class="metrics">${metric(`Rent budget at ${share}%`, money(income * share / 100))}${metric('Cities that fit', `${comfortable} of ${rows.length}`)}</div>`;
+  html += rows.map(r => `<div class="card"><h3 style="font-size:15px">${r.icon} ${esc(r.city)} · ${esc(r.label)}</h3>
+    <p class="muted xs">Rent ${money(r.rent)}/month · ${int(r.pct)}% of income · ${money(r.left)} left after rent and other costs</p></div>`).join('');
+  if (!rows.length) html += note('info', 'No cities with rent data to compare yet.');
+  if (missing > 0) html += `<p class="muted xs">${missing} ${missing === 1 ? 'city has' : 'cities have'} no rent data and ${missing === 1 ? 'is' : 'are'} not listed.</p>`;
+  return html + disclaimer('Uses the 1-bedroom rent figures in this guide, which may be out of date. Spending about 30% of income on rent is a rule of thumb, not a rule. Comfortable is within your target, Stretch is up to 10 points above.');
+};
+views.advisor = () => {
+  const html = `${back('More', 'more')}${heading('Rent advisor ⭐', 'Ask about budgeting, finding a place, applications, deposits and rental scams.')}`;
+  if (!state.premium) return html + premiumLock('advisor', 'Upgrade to Premium to use this service', 'The Rent advisor is a Premium feature.');
+  return html + note('info', '🚧 Coming soon: an AI Rent advisor for budgeting, applications, deposits and rental scams.') + btn('🙋 I’d use this', 'interest') + premiumBar();
+};
+views.feedback = () => {
+  let html = `${back('More', 'more')}${heading('Help us improve This is BC', 'Six quick questions, under a minute. No names or emails are collected.')}`;
+  if (state.fbSent) {
+    const msg = { true: 'Thank you! Your answers were recorded.', null: 'Thank you! Your answers are saved on this device.',
+      false: 'Thank you! We couldn’t reach the server, so your answers are saved on this device and will be sent next time.' }[state.fbStatus];
+    html += note('success', msg) + btn('Send another response', 'fbagain');
+  } else {
+    const f = state.fb;
+    html += select('Which describes you best?', 'fb:who', D.feedbackWho, f.who, 'Choose one') +
+      `<label class="field"><span>How much did This is BC help you narrow down where to live? <b id="fb-helped">${f.helped}</b> (1 = not at all, 5 = a lot)</span><input type="range" min="1" max="5" step="1" value="${f.helped}" data-in="fb:helped"></label>` +
+      select('Which feature was most useful?', 'fb:useful', D.feedbackFeatures, f.useful, 'Choose one') +
+      select('Have you used This is BC before today?', 'fb:used', [FIRST_TIME, USED_BEFORE], f.used) +
+      select('Would you pay for Premium (Budget planner and shortlist summary)?', 'fb:pay', D.wtp, f.pay) +
+      `<label class="field"><span>What is missing or confusing? (no personal details, please)</span><textarea maxlength="500" data-in="fb:missing">${esc(f.missing)}</textarea></label>` +
+      btn('Send feedback', 'fbsend', '', 'primary full');
+  }
+  if (state.pending.length) html += `<p class="muted xs">${state.pending.length} saved response${state.pending.length === 1 ? '' : 's'} on this device.</p><div class="row">${CONFIG.feedbackUrl ? btn('Send saved responses', 'fbflush') : ''}${btn('Download saved answers (CSV)', 'fbcsv')}</div>`;
+  return html;
+};
+
+/* ---------- rendering and routing ---------- */
+const TAB_OF = { home: 0, explore: 1, city: 1, compare: 2, shortlist: 3 };
+const render = (keepScroll = false) => {
+  applyTheme();
+  const [kind, arg] = [state.route.split(':')[0], state.route.split(':').slice(1).join(':')];
+  const screen = $('#screen'), top = screen.scrollTop;
+  screen.innerHTML = (views[kind] || views.home)(arg);
+  screen.scrollTop = keepScroll ? top : 0;
+  document.querySelectorAll('.tab').forEach((t, i) => { if (i === (TAB_OF[kind] ?? 4)) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current'); });
+};
+const go = route => { state.route = route; render(); };
+const part = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+
+/* ---------- sending (Feedback and demand signals) ---------- */
+const sendPayload = async payload => {
+  if (!CONFIG.feedbackUrl) return null;                      // null: nowhere to send, kept on this device
+  try { await fetch(CONFIG.feedbackUrl, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) }); return true; }
+  catch { return false; }
+};
+const nowIso = () => new Date().toISOString().replace(/\.\d+Z$/, 'Z');
+const event = (kind, detail = '') => { if (CONFIG.feedbackUrl) sendPayload({ type: kind, channel: 'mobile-html', time_utc: nowIso(), detail }); };
+const safeCell = v => { const s = String(v ?? ''); return '=+-@'.includes(s[0] || ' ') ? "'" + s : s; };
+const toCsv = rows => { const cols = ['time_utc', 'type', 'channel', 'who', 'helped', 'useful', 'used_before', 'would_pay', 'missing'];
+  return [cols.join(',')].concat(rows.map(r => cols.map(c => '"' + safeCell(r[c]).replaceAll('"', '""') + '"').join(','))).join('\r\n'); };
+
+/* ---------- actions ---------- */
+const actions = {
+  tab: a => go(['home', 'explore', 'compare', 'shortlist', 'more'][+a]),
+  go: a => go(a),
+  open: a => go('city:' + a),
+  save: a => { const i = state.shortlist.indexOf(a); if (i >= 0) state.shortlist.splice(i, 1); else state.shortlist.push(a); persist(); render(true); },
+  cmp: a => {
+    const i = state.compare.indexOf(a);
+    if (i >= 0) { state.compare.splice(i, 1); toast(`${a} removed from your comparison`); }
+    else if (state.compare.length < 3) { state.compare.push(a); toast(`${a} added to your comparison`); }
+    else toast('You can compare up to 3 cities. Remove one first.');
+    render(true);
+  },
+  cmpdel: a => { state.compare = state.compare.filter(n => n !== a); render(true); },
+  sort: a => { state.sort = a; render(true); },
+  shuffle: () => { const pool = names.slice(); for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; } state.featured = pool.slice(0, 3); render(true); },
+  pick: (a, b) => { if (b === 'city') go('city:' + a); else { state.region = a; state.q = ''; go('explore'); } },
+  upgrade: a => { event('upgrade_click', a || 'unknown'); if (DEMO_UNLOCK) { state.premium = true; toast('⭐ Premium unlocked for this demo session.'); render(true); } else toast('Premium isn’t available in this prototype yet.'); },
+  free: () => { state.premium = false; render(true); },
+  interest: () => { event('advisor_interest'); toast('Thanks, noted. Your interest helps us decide what to build next.'); },
+  share: () => openDialog(`<h3>My shortlist</h3><pre id="share-text">${esc(reportText(state.shortlist.map(cityByName).filter(Boolean), state.budget))}</pre>
+    <div class="row">${btn('Copy', 'copy', '', 'primary')}${btn('Close', 'close')}</div>`),
+  copy: async () => {
+    const text = $('#share-text').textContent;
+    try { await navigator.clipboard.writeText(text); toast('Copied to your clipboard'); }
+    catch { const r = document.createRange(); r.selectNodeContents($('#share-text')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast(document.execCommand && document.execCommand('copy') ? 'Copied to your clipboard' : 'Select the text and copy it'); }
+  },
+  close: () => closeDialog(),
+  install: async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    await installPrompt.userChoice.catch(() => null);
+    installPrompt = null; render(true);
+  },
+  locate: () => {
+    if (!navigator.geolocation) return toast('Your browser can’t share a location.');
+    navigator.geolocation.getCurrentPosition(p => { state.myLoc = [p.coords.latitude, p.coords.longitude]; state.servicesCity = D.myLocation; render(true); },
+      () => toast('Couldn’t get your location. Pick a city instead.'), { timeout: 8000 });
+  },
+  fbagain: () => { state.fbSent = false; render(true); },
+  fbsend: async () => {
+    const f = state.fb;
+    if (!f.who || !f.useful) return toast('Please answer the first and third questions.');
+    const payload = { type: 'feedback', channel: 'mobile-html', time_utc: nowIso(), who: f.who, helped: f.helped, useful: f.useful,
+      used_before: f.used === USED_BEFORE ? 'Yes' : 'No', would_pay: f.pay, missing: f.missing.trim() };
+    state.fbStatus = await sendPayload(payload);
+    if (state.fbStatus !== true) state.pending.push(payload);
+    persist(); state.fb = newFeedback(); state.fbSent = true; render();
+  },
+  fbflush: async () => {
+    for (const p of state.pending.slice()) { if (await sendPayload(p) !== true) break; state.pending.splice(state.pending.indexOf(p), 1); }
+    persist(); render(true);
+  },
+  fbcsv: () => {
+    const url = URL.createObjectURL(new Blob([toCsv(state.pending)], { type: 'text/csv' })), a = document.createElement('a');
+    a.href = url; a.download = 'this-is-bc-feedback.csv'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  },
+};
+const openDialog = html => { $('#dialog').innerHTML = html; $('#modal').hidden = false; };
+const closeDialog = () => { $('#modal').hidden = true; };
+
+/* ---------- events (one listener each) ---------- */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (el && !el.disabled) { const fn = actions[el.dataset.act]; if (fn) fn(el.dataset.a, el.dataset.b); return; }
+  if (e.target.id === 'modal') closeDialog();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDialog(); });
+const inputs = {
+  homeq: v => part('home-sugg', searchMatches(v).map(([label, kind]) =>
+    `<button class="btn plain full" style="justify-content:flex-start" data-act="pick" data-a="${esc(label)}" data-b="${kind}">${kind === 'city' ? '' : 'Region: '}${esc(label)}</button>`).join('')),
+  exq: v => { state.q = v; part('ex-results', exploreList()); },
+  costIncome: v => { state.costIncome = parseNumber(v); part('cost-results', costResults()); },
+  budIncome: v => { state.budIncome = parseNumber(v); part('bud-results', budgetResults()); },
+  budOther: v => { state.budOther = parseNumber(v); part('bud-results', budgetResults()); },
+  budShare: v => { state.budShare = Math.round(parseNumber(v) / 5) * 5; part('bud-share', String(state.budShare)); part('bud-results', budgetResults()); },
+};
+document.addEventListener('input', e => {
+  const key = e.target.dataset && e.target.dataset.in;
+  if (!key) return;
+  if (key.startsWith('cost:')) { (state.costActual[state.costCity] ||= {})[key.slice(5)] = parseNumber(e.target.value); part('cost-results', costResults()); }
+  else if (key === 'fb:helped') { state.fb.helped = Math.round(Number(e.target.value)); part('fb-helped', String(state.fb.helped)); }
+  else if (key === 'fb:missing') state.fb.missing = e.target.value;
+  else if (inputs[key]) inputs[key](e.target.value);
+});
+document.addEventListener('change', e => {
+  const key = e.target.dataset && e.target.dataset.ch, v = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+  if (!key) return;
+  if (key === 'region') { state.region = v; render(true); }
+  else if (key === 'savedOnly') { state.savedOnly = v; render(true); }
+  else if (key === 'showDiff') { state.showDiff = v; render(true); }
+  else if (key === 'cmpadd') { if (v && !state.compare.includes(v) && state.compare.length < 3) state.compare.push(v); render(true); }
+  else if (key === 'costCity') { state.costCity = v; render(true); }
+  else if (key === 'servicesCity') { state.servicesCity = v; render(true); }
+  else if (key === 'theme') { state.theme = v; persist(); render(true); }
+  else if (key.startsWith('fb:')) state.fb[{ 'fb:who': 'who', 'fb:useful': 'useful', 'fb:used': 'used', 'fb:pay': 'pay' }[key]] = v;
+});
+
+/* ---------- install as an app + work offline ---------- */
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; if (state.route === 'more') render(true); });
+window.addEventListener('appinstalled', () => { installPrompt = null; toast('Installed. Open it from your home screen.'); if (state.route === 'more') render(true); });
+// Only on a web address (not a double-clicked file). If it can't register, the app still works online, so nothing to report.
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+
+/* for the checks in tests: the logic is also reachable from the console as window.__bc */
+window.__bc = { rentValue, shortRent, csiText, veganLabel, veganScore, climateTier, sortCities, sortBadge, nearestOffices, officeDirectionsLinks, mapLinks, directionsLinks,
+  getPlaces, compareRows, quickAdvice, typicalCosts, costSummary, budgetRows, shortlistRows, reportText, searchMatches, getSeason, parseNumber, formatPop, cities, state, go, render, SORT_MODES };
+render();
+</script>
+</body>
+</html>
